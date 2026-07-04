@@ -48,14 +48,14 @@ body::before {
 .panel-inset,
 .stat-card {
   border: 1px solid var(--line);
-  box-shadow: var(--shadow);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .panel {
   background: rgba(248, 252, 255, 0.46);
   backdrop-filter: blur(6px);
   border-radius: var(--radius);
-}
+  grid-template-columns: 280px minmax(0, 1fr);
 
 .panel-inset {
   background: linear-gradient(180deg, rgba(249, 252, 255, 0.34), rgba(235, 244, 250, 0.3));
@@ -272,66 +272,8 @@ h3 {
   padding: 22px;
 }
 
-.day-list {
-  display: grid;
-  gap: 10px;
+.day-selector-field {
   margin-top: 16px;
-}
-
-.day-card {
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  padding: 14px;
-  background: rgba(248, 252, 255, 0.34);
-  cursor: pointer;
-  transition: transform 0.16s ease, border-color 0.16s ease, background 0.16s ease;
-}
-
-.day-card:hover {
-  transform: translateY(-1px);
-  border-color: rgba(47, 120, 168, 0.35);
-}
-
-.day-card.active {
-  border-color: rgba(47, 120, 168, 0.58);
-  background: rgba(234, 246, 255, 0.46);
-}
-
-.day-card.completed {
-  background: rgba(223, 244, 233, 0.82);
-  border-color: rgba(31, 108, 104, 0.28);
-}
-
-.day-card-top,
-.day-card-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.day-card-top {
-  margin-bottom: 8px;
-}
-
-.day-number {
-  font-size: 0.78rem;
-  font-weight: 800;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--teal);
-}
-
-.day-date,
-.day-meta-small,
-.progress-tag {
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-
-.day-card h3 {
-  font-size: 1.15rem;
-  margin-bottom: 6px;
 }
 
 .main-column,
@@ -461,16 +403,34 @@ textarea {
 
 .place-item-top {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 14px;
 }
 
 .place-check {
-  display: inline-flex;
-  align-items: center;
+  display: flex;
+  align-items: flex-start;
   gap: 12px;
   font-weight: 800;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.place-check input {
+  margin-top: 3px;
+  flex: 0 0 auto;
+}
+
+.place-name {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.place-caption {
+  flex: 0 0 auto;
+  text-align: right;
 }
 
 .place-item.done {

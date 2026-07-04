@@ -49,11 +49,6 @@
           <span class="stat-note">Checklist de sitios reales</span>
         </article>
         <article class="stat-card panel">
-          <span class="stat-label">Gasto total</span>
-          <strong id="stat-expense-total" class="stat-value">¥0</strong>
-          <span class="stat-note">Suma de gastos guardados</span>
-        </article>
-        <article class="stat-card panel">
           <span class="stat-label">Ultima actualizacion</span>
           <strong id="stat-last-updated" class="stat-value">Sin registrar</strong>
           <span class="stat-note">Sincronizado local y Drive</span>
@@ -66,7 +61,10 @@
             <h2>Dias del viaje</h2>
             <span id="sidebar-summary" class="muted">0 dias</span>
           </div>
-          <div id="day-list" class="day-list"></div>
+          <label class="field day-selector-field">
+            <span>Selecciona un dia</span>
+            <select id="day-selector"></select>
+          </label>
         </aside>
 
         <section class="main-column">

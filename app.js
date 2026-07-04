@@ -15,7 +15,7 @@ const UI = {
   statExpenseTotal: document.getElementById("stat-expense-total"),
   statLastUpdated: document.getElementById("stat-last-updated"),
   sidebarSummary: document.getElementById("sidebar-summary"),
-  dayList: document.getElementById("day-list"),
+  daySelector: document.getElementById("day-selector"),
   dayChip: document.getElementById("day-chip"),
   dayTitle: document.getElementById("day-title"),
   dayMeta: document.getElementById("day-meta"),
@@ -140,36 +140,25 @@ function renderStats() {
   const stats = computeStats();
   UI.statDaysCompleted.textContent = `${stats.completedDays} / ${appState.days.length}`;
   UI.statPlacesProgress.textContent = `${stats.visitedPlaces} / ${stats.totalPlaces}`;
-  UI.statExpenseTotal.textContent = formatCurrency(stats.totalExpense);
+  if (UI.statExpenseTotal) {
+    UI.statExpenseTotal.textContent = formatCurrency(stats.totalExpense);
+  }
   UI.statLastUpdated.textContent = formatDateTime(appState.lastUpdated);
   UI.sidebarSummary.textContent = `${appState.days.length} dias cargados`;
 }
 
-function renderDayList() {
-  UI.dayList.innerHTML = appState.days
-    .map((day) => {
-      const visitedCount = countVisitedPlaces(day);
-      const isActive = day.id === selectedDayId;
-      const cardClasses = ["day-card"];
-      if (isActive) cardClasses.push("active");
-      if (day.completed) cardClasses.push("completed");
-
-      return `
-        <article class="${cardClasses.join(" ")}" data-day-id="${escapeHtml(day.id)}">
-          <div class="day-card-top">
-            <span class="day-number">${escapeHtml(getDayLabel(day))}</span>
-            <span class="day-date">${escapeHtml(formatDate(day.date))}</span>
-          </div>
-          <h3>${escapeHtml(day.shortTitle || day.title)}</h3>
-          <div class="day-meta-small">${escapeHtml(day.base)} · ${escapeHtml(day.weekday)}</div>
-          <div class="day-card-bottom">
-            <span class="progress-tag">${visitedCount}/${day.places.length} sitios</span>
-            <span class="progress-tag">${day.completed ? "Completado" : "Pendiente"}</span>
-          </div>
-        </article>
-      `;
-    })
+function renderDaySelector() {
+  if (!UI.daySelector) return;
+  const previousValue = UI.daySelector.value;
+  UI.daySelector.innerHTML = appState.days
+    .map((day) => `<option value="${escapeHtml(day.id)}">${escapeHtml(getDayLabel(day))} · ${escapeHtml(formatDate(day.date))} · ${escapeHtml(day.shortTitle || day.title)}</option>`)
     .join("");
+
+  if (previousValue && appState.days.some((day) => day.id === previousValue)) {
+    UI.daySelector.value = previousValue;
+  } else if (selectedDayId) {
+    UI.daySelector.value = selectedDayId;
+  }
 }
 
 function renderSchedule(day) {
@@ -355,7 +344,7 @@ function renderActivity() {
 function renderAll() {
   renderAppHeader();
   renderStats();
-  renderDayList();
+  renderDaySelector();
   renderDayDetail();
   populateExpenseDayOptions();
   renderExpenses();
@@ -366,8 +355,10 @@ function renderAll() {
 function setSelectedDay(dayId) {
   if (!appState.days.some((day) => day.id === dayId)) return;
   selectedDayId = dayId;
+  if (UI.daySelector) {
+    UI.daySelector.value = dayId;
+  }
   UI.expenseDay.value = dayId;
-  renderDayList();
   renderDayDetail();
 }
 
@@ -533,11 +524,11 @@ async function handleDriveSignOut() {
 }
 
 function bindEvents() {
-  UI.dayList.addEventListener("click", (event) => {
-    const card = event.target.closest("[data-day-id]");
-    if (!card) return;
-    setSelectedDay(card.getAttribute("data-day-id"));
-  });
+  if (UI.daySelector) {
+    UI.daySelector.addEventListener("change", (event) => {
+      setSelectedDay(event.target.value);
+    });
+  }
 
   UI.placesList.addEventListener("change", async (event) => {
     const target = event.target;
