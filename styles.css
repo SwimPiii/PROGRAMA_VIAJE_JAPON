@@ -48,14 +48,15 @@ body::before {
 .panel-inset,
 .stat-card {
   border: 1px solid var(--line);
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  box-shadow: var(--shadow);
 }
 
 .panel {
+  display: block;
   background: rgba(248, 252, 255, 0.46);
   backdrop-filter: blur(6px);
   border-radius: var(--radius);
-  grid-template-columns: 280px minmax(0, 1fr);
+}
 
 .panel-inset {
   background: linear-gradient(180deg, rgba(249, 252, 255, 0.34), rgba(235, 244, 250, 0.3));
@@ -70,7 +71,7 @@ body::before {
   padding: 26px;
   position: relative;
   overflow: hidden;
-  align-items: start;
+  align-items: center;
 }
 
 .hero::before {
@@ -97,7 +98,7 @@ h2,
 h3 {
   margin: 0;
   font-family: "Cormorant Garamond", serif;
-  line-height: 1;
+  line-height: 1.08;
 }
 
 h1 {
@@ -126,7 +127,7 @@ h3 {
 
 .hero-sync-simple {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: flex-end;
 }
 
@@ -174,10 +175,15 @@ h3 {
 }
 
 .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
   border: 0;
   border-radius: 999px;
   padding: 12px 18px;
   font: inherit;
+  line-height: 1.2;
   font-weight: 800;
   cursor: pointer;
   transition: transform 0.16s ease, opacity 0.16s ease, background 0.16s ease;
@@ -226,7 +232,7 @@ h3 {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 16px;
   margin: 18px 0;
 }
@@ -235,6 +241,7 @@ h3 {
   padding: 18px 20px;
   border-radius: 22px;
   background: rgba(248, 252, 255, 0.42);
+  min-height: 124px;
 }
 
 .stat-label {
@@ -244,6 +251,7 @@ h3 {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--muted);
+  line-height: 1.35;
 }
 
 .stat-value {
@@ -251,12 +259,14 @@ h3 {
   margin-top: 12px;
   font-family: "Cormorant Garamond", serif;
   font-size: clamp(1.9rem, 3vw, 2.4rem);
+  line-height: 1.08;
 }
 
 .stat-note {
   display: block;
   margin-top: 8px;
   font-size: 0.92rem;
+  line-height: 1.45;
 }
 
 .content-grid {
