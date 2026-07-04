@@ -261,7 +261,7 @@ h3 {
 
 .content-grid {
   display: grid;
-  grid-template-columns: 340px minmax(0, 1fr);
+  grid-template-columns: 1fr;
   gap: 18px;
 }
 
@@ -274,6 +274,7 @@ h3 {
 
 .day-selector-field {
   margin-top: 16px;
+  max-width: 720px;
 }
 
 .main-column,
@@ -402,18 +403,18 @@ textarea {
 }
 
 .place-item-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
   gap: 14px;
 }
 
 .place-check {
-  display: flex;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
   gap: 12px;
   font-weight: 800;
-  flex: 1 1 auto;
   min-width: 0;
 }
 
@@ -425,12 +426,22 @@ textarea {
 .place-name {
   display: block;
   min-width: 0;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .place-caption {
   flex: 0 0 auto;
   text-align: right;
+}
+
+@media (max-width: 900px) {
+  .place-item-top {
+    grid-template-columns: 1fr;
+  }
+
+  .place-caption {
+    text-align: left;
+  }
 }
 
 .place-item.done {
