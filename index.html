@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Bitacora Japon 2026</title>
+    <title>Viaje simiesco japonesil</title>
     <meta
       name="description"
-      content="App web compartida para seguir el itinerario de Japon 2026, marcar visitas reales y registrar gastos del viaje."
+      content="Viaje simiesco japonesil: itinerario compartido, visitas y gastos del viaje."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -25,36 +25,15 @@
     <div class="page-shell">
       <header class="hero panel">
         <div class="hero-copy">
-          <p class="eyebrow">Viaje compartido</p>
-          <h1 id="app-title">Bitacora Japon 2026</h1>
-          <p id="app-subtitle" class="hero-subtitle">Checklist viva del viaje, gastos y diario sincronizado.</p>
-          <div class="hero-tags">
-            <span class="pill">Itinerario interactivo</span>
-            <span class="pill">Gastos compartidos</span>
-            <span class="pill">Guardado en Drive</span>
-          </div>
+          <h1 id="app-title">Viaje simiesco japonesil</h1>
         </div>
 
-        <div class="hero-sync panel-inset">
-          <div class="sync-row">
-            <span class="sync-label">Drive</span>
-            <span id="drive-status" class="sync-value muted">Preparando...</span>
-          </div>
-          <div class="sync-row">
-            <span class="sync-label">Guardado</span>
-            <span id="save-status" class="sync-value muted">Sin cambios pendientes</span>
-          </div>
-          <div class="sync-row">
-            <span class="sync-label">Version</span>
-            <span id="app-version" class="sync-value">v0.1.0</span>
-          </div>
-          <div class="sync-actions">
-            <button id="btn-drive-signin" class="btn primary" type="button">Conectar Drive</button>
-            <button id="btn-drive-signout" class="btn subtle" type="button">Cerrar sesion</button>
-          </div>
-          <p class="sync-help">
-            Para que la familia vea el seguimiento, basta con compartir la carpeta de Drive con sus cuentas y abrir esta app.
-          </p>
+        <div class="hero-sync hero-sync-simple">
+          <button id="btn-drive-signin" class="btn primary" type="button">Conectar Drive</button>
+          <button id="btn-drive-signout" class="visually-hidden" type="button" aria-hidden="true" tabindex="-1">Cerrar sesion</button>
+          <span id="drive-status" class="visually-hidden">Preparando...</span>
+          <span id="save-status" class="visually-hidden">Sin cambios pendientes</span>
+          <span id="app-version" class="visually-hidden">v0.1.0</span>
         </div>
       </header>
 
@@ -153,7 +132,6 @@
               <div class="panel-head">
                 <div>
                   <h2>Gastos del viaje</h2>
-                  <p class="muted">Comida, transporte, entradas o extras</p>
                 </div>
                 <span id="expenses-summary" class="muted">0 gastos</span>
               </div>
@@ -164,35 +142,26 @@
                   <select id="expense-day" required></select>
                 </label>
                 <label class="field">
-                  <span>Fecha</span>
-                  <input id="expense-date" type="date" required />
-                </label>
-                <label class="field">
-                  <span>Categoria</span>
-                  <select id="expense-category" required>
-                    <option value="Comida">Comida</option>
-                    <option value="Transporte">Transporte</option>
-                    <option value="Entradas">Entradas</option>
-                    <option value="Hotel">Hotel</option>
-                    <option value="Compras">Compras</option>
-                    <option value="Extra">Extra</option>
-                  </select>
-                </label>
-                <label class="field">
                   <span>Pagado por</span>
-                  <input id="expense-paid-by" type="text" placeholder="Ej. Ismael, Mama, comun" value="Comun" />
+                  <select id="expense-paid-by" required>
+                    <option value="ISMAEL">ISMAEL</option>
+                    <option value="DAVID">DAVID</option>
+                  </select>
                 </label>
                 <label class="field field-wide">
                   <span>Concepto</span>
-                  <input id="expense-title" type="text" placeholder="Ej. Ramen en Asakusa, billetes, entrada al templo..." required />
+                  <input id="expense-title" type="text" placeholder="Que se ha pagado" required />
                 </label>
                 <label class="field">
                   <span>Importe</span>
                   <input id="expense-amount" type="number" step="0.01" min="0" placeholder="0.00" required />
                 </label>
-                <label class="field field-wide">
-                  <span>Notas</span>
-                  <input id="expense-notes" type="text" placeholder="Ej. Para 2 personas, efectivo, con bebida..." />
+                <label class="field checkbox-field">
+                  <span>Gasto comun</span>
+                  <label class="checkbox-inline">
+                    <input id="expense-is-common" type="checkbox" />
+                    <span>Si</span>
+                  </label>
                 </label>
                 <div class="form-actions field-wide">
                   <button class="btn primary" type="submit">Anadir gasto</button>
@@ -203,11 +172,10 @@
                 <table class="expenses-table">
                   <thead>
                     <tr>
-                      <th>Fecha</th>
                       <th>Dia</th>
                       <th>Concepto</th>
-                      <th>Categoria</th>
                       <th>Pagado por</th>
+                      <th>Comun</th>
                       <th>Importe</th>
                       <th></th>
                     </tr>
@@ -220,8 +188,7 @@
             <article class="panel activity-panel">
               <div class="panel-head">
                 <div>
-                  <h2>Actividad reciente</h2>
-                  <p class="muted">Lo ultimo marcado o anotado</p>
+                  <h2>Resumen comun</h2>
                 </div>
               </div>
               <div id="activity-list" class="activity-list"></div>

@@ -30,12 +30,10 @@ const UI = {
   dayNotes: document.getElementById("day-notes"),
   expenseForm: document.getElementById("expense-form"),
   expenseDay: document.getElementById("expense-day"),
-  expenseDate: document.getElementById("expense-date"),
-  expenseCategory: document.getElementById("expense-category"),
   expensePaidBy: document.getElementById("expense-paid-by"),
   expenseTitle: document.getElementById("expense-title"),
   expenseAmount: document.getElementById("expense-amount"),
-  expenseNotes: document.getElementById("expense-notes"),
+  expenseIsCommon: document.getElementById("expense-is-common"),
   expensesSummary: document.getElementById("expenses-summary"),
   expensesBody: document.getElementById("expenses-body"),
   activityList: document.getElementById("activity-list")
@@ -106,25 +104,36 @@ function computeStats() {
 }
 
 function setSaveStatus(message, isMuted = false) {
+  if (!UI.saveStatus) return;
   UI.saveStatus.textContent = message;
   UI.saveStatus.classList.toggle("muted", isMuted);
 }
 
 function setDriveStatus(message, isMuted = false) {
+  if (!UI.driveStatus) return;
   UI.driveStatus.textContent = message;
   UI.driveStatus.classList.toggle("muted", isMuted);
 }
 
 function updateSyncButtons() {
   const signedIn = Boolean(window.driveApi && window.driveApi.isSignedIn && window.driveApi.isSignedIn());
-  UI.btnDriveSignin.disabled = signedIn;
-  UI.btnDriveSignout.disabled = !signedIn;
+  UI.btnDriveSignin.classList.toggle("connected", signedIn);
+  UI.btnDriveSignin.textContent = "Conectar Drive";
+  if (UI.btnDriveSignout) {
+    UI.btnDriveSignout.disabled = !signedIn;
+  }
 }
 
 function renderAppHeader() {
-  UI.appTitle.textContent = appState.meta.title || "Bitacora Japon 2026";
-  UI.appSubtitle.textContent = appState.meta.subtitle || "Checklist viva del viaje";
-  UI.appVersion.textContent = cfg.version || "v0.1.0";
+  if (UI.appTitle) {
+    UI.appTitle.textContent = appState.meta.title || "Viaje simiesco japonesil";
+  }
+  if (UI.appSubtitle) {
+    UI.appSubtitle.textContent = appState.meta.subtitle || "";
+  }
+  if (UI.appVersion) {
+    UI.appVersion.textContent = cfg.version || "v0.1.0";
+  }
 }
 
 function renderStats() {
@@ -252,6 +261,13 @@ function getDayById(dayId) {
   return appState.days.find((day) => day.id === dayId) || null;
 }
 
+function getSafeState(state) {
+  if (!state || !Array.isArray(state.days) || !state.days.length) {
+    return getDefaultState();
+  }
+  return state;
+}
+
 function renderExpenses() {
   const expenses = [...appState.expenses].sort((left, right) => {
     const leftTime = new Date(left.date || left.createdAt).getTime();
@@ -267,79 +283,73 @@ function renderExpenses() {
           const day = getDayById(expense.dayId);
           return `
             <tr>
-              <td>${escapeHtml(formatDate(expense.date))}</td>
               <td>${escapeHtml(day ? getDayLabel(day) : "-")}</td>
               <td>
                 <strong>${escapeHtml(expense.title)}</strong>
-                ${expense.notes ? `<div class="muted">${escapeHtml(expense.notes)}</div>` : ""}
               </td>
-              <td>${escapeHtml(expense.category)}</td>
               <td>${escapeHtml(expense.paidBy)}</td>
+              <td>${expense.isCommon ? "Si" : "No"}</td>
               <td class="amount">${escapeHtml(formatCurrency(expense.amount))}</td>
               <td><button class="btn subtle" type="button" data-action="delete-expense" data-expense-id="${escapeHtml(expense.id)}">Borrar</button></td>
             </tr>
           `;
         })
         .join("")
-    : `<tr><td colspan="7"><div class="empty-state">Aun no hay gastos registrados.</div></td></tr>`;
+    : `<tr><td colspan="5"><div class="empty-state">Aun no hay gastos registrados.</div></td></tr>`;
 }
 
-function getRecentActivity() {
-  const activity = [];
+function computeCommonExpenseSummary() {
+  const commonExpenses = appState.expenses.filter((expense) => expense.isCommon);
+  const totalCommon = commonExpenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
 
-  appState.days.forEach((day) => {
-    if (day.updatedAt) {
-      activity.push({
-        type: day.completed ? "dia" : "nota",
-        title: `${getDayLabel(day)} · ${day.shortTitle || day.title}`,
-        detail: day.completed ? "Dia marcado como completado" : "Notas del dia actualizadas",
-        when: day.updatedAt
-      });
+  let davidOwesIsmael = 0;
+  let ismaelOwesDavid = 0;
+
+  commonExpenses.forEach((expense) => {
+    const half = Number(expense.amount || 0) / 2;
+    if (expense.paidBy === "ISMAEL") {
+      davidOwesIsmael += half;
+    } else if (expense.paidBy === "DAVID") {
+      ismaelOwesDavid += half;
     }
-
-    day.places.forEach((place) => {
-      if (place.updatedAt && place.done) {
-        activity.push({
-          type: "lugar",
-          title: place.name,
-          detail: `${getDayLabel(day)} · ${day.shortTitle || day.title}`,
-          when: place.updatedAt
-        });
-      }
-    });
   });
 
-  appState.expenses.forEach((expense) => {
-    activity.push({
-      type: "gasto",
-      title: `${expense.title} · ${formatCurrency(expense.amount)}`,
-      detail: `${expense.category} · ${expense.paidBy}`,
-      when: expense.updatedAt || expense.createdAt
-    });
-  });
+  const net = davidOwesIsmael - ismaelOwesDavid;
 
-  return activity
-    .filter((entry) => entry.when)
-    .sort((left, right) => new Date(right.when).getTime() - new Date(left.when).getTime())
-    .slice(0, 12);
+  return {
+    totalCommon,
+    davidOwesIsmael,
+    ismaelOwesDavid,
+    net
+  };
 }
 
 function renderActivity() {
-  const activity = getRecentActivity();
-  UI.activityList.innerHTML = activity.length
-    ? activity
-        .map(
-          (entry) => `
-            <article class="activity-item">
-              <span class="activity-kind">${escapeHtml(entry.type)}</span>
-              <div class="activity-title">${escapeHtml(entry.title)}</div>
-              <div class="activity-meta">${escapeHtml(entry.detail)}</div>
-              <div class="activity-meta">${escapeHtml(formatDateTime(entry.when))}</div>
-            </article>
-          `
-        )
-        .join("")
-    : '<div class="empty-state">Todavia no hay actividad registrada. En cuanto marqueis lugares o anadais gastos, aparecera aqui.</div>';
+  const summary = computeCommonExpenseSummary();
+  const netText = summary.net > 0
+    ? `DAVID debe a ISMAEL ${formatCurrency(summary.net)}`
+    : summary.net < 0
+      ? `ISMAEL debe a DAVID ${formatCurrency(Math.abs(summary.net))}`
+      : "No hay deuda neta";
+
+  UI.activityList.innerHTML = `
+    <article class="activity-item summary-card">
+      <div class="activity-title">Total gastos comunes</div>
+      <div class="summary-amount">${escapeHtml(formatCurrency(summary.totalCommon))}</div>
+    </article>
+    <article class="activity-item summary-card">
+      <div class="activity-title">DAVID debe a ISMAEL</div>
+      <div class="summary-amount">${escapeHtml(formatCurrency(summary.davidOwesIsmael))}</div>
+    </article>
+    <article class="activity-item summary-card">
+      <div class="activity-title">ISMAEL debe a DAVID</div>
+      <div class="summary-amount">${escapeHtml(formatCurrency(summary.ismaelOwesDavid))}</div>
+    </article>
+    <article class="activity-item summary-card">
+      <div class="activity-title">Saldo neto</div>
+      <div class="activity-meta summary-net">${escapeHtml(netText)}</div>
+    </article>
+  `;
 }
 
 function renderAll() {
@@ -449,29 +459,30 @@ async function handleAddExpense(event) {
   event.preventDefault();
   const amount = Number(UI.expenseAmount.value);
   if (!Number.isFinite(amount) || amount <= 0) return;
+  const selectedDay = getDayById(UI.expenseDay.value);
 
   const expense = {
     id: newId("expense"),
     dayId: UI.expenseDay.value,
-    date: UI.expenseDate.value,
-    category: UI.expenseCategory.value,
+    date: selectedDay?.date || new Date().toISOString().slice(0, 10),
+    category: "General",
     title: UI.expenseTitle.value.trim(),
     amount,
-    paidBy: UI.expensePaidBy.value.trim() || "Comun",
-    notes: UI.expenseNotes.value.trim(),
+    paidBy: UI.expensePaidBy.value,
+    isCommon: Boolean(UI.expenseIsCommon.checked),
+    notes: "",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
   };
 
-  if (!expense.dayId || !expense.date || !expense.title) return;
+  if (!expense.dayId || !expense.title) return;
 
   appState.expenses.unshift(expense);
   renderExpenses();
   renderActivity();
   renderStats();
   UI.expenseForm.reset();
-  UI.expensePaidBy.value = "Comun";
-  UI.expenseDate.value = expense.date;
+  UI.expensePaidBy.value = "ISMAEL";
   if (selectedDayId) {
     UI.expenseDay.value = selectedDayId;
   }
@@ -490,6 +501,10 @@ async function handleDeleteExpense(expenseId) {
 async function handleDriveSignIn() {
   if (!window.driveApi) return;
   try {
+    if (window.driveApi.isSignedIn && window.driveApi.isSignedIn()) {
+      await handleDriveSignOut();
+      return;
+    }
     setDriveStatus("Conectando...", false);
     await window.driveApi.signIn();
     setDriveStatus("Drive conectado", false);
@@ -574,9 +589,8 @@ function bindEvents() {
 
 async function initApp() {
   bindEvents();
-  UI.expenseDate.value = new Date().toISOString().slice(0, 10);
 
-  appState = await loadState(false);
+  appState = getSafeState(await loadState(false));
   if (!appState.days.some((day) => day.id === selectedDayId)) {
     selectedDayId = appState.days[0]?.id || null;
   }
@@ -593,7 +607,7 @@ async function initApp() {
       setDriveStatus(signedIn ? "Drive conectado" : "Modo local", !signedIn);
 
       if (signedIn) {
-        appState = await loadState(true);
+        appState = getSafeState(await loadState(true));
         if (!appState.days.some((day) => day.id === selectedDayId)) {
           selectedDayId = appState.days[0]?.id || null;
         }

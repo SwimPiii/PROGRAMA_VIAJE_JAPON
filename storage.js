@@ -579,7 +579,8 @@ function normalizeExpense(rawExpense) {
     category: normalizeString(rawExpense && rawExpense.category) || "General",
     title: normalizeString(rawExpense && rawExpense.title),
     amount: normalizeNumber(rawExpense && rawExpense.amount),
-    paidBy: normalizeString(rawExpense && rawExpense.paidBy) || "Viaje",
+    paidBy: normalizeString(rawExpense && rawExpense.paidBy) || "ISMAEL",
+    isCommon: Boolean(rawExpense && rawExpense.isCommon),
     notes: normalizeString(rawExpense && rawExpense.notes),
     createdAt: normalizeString(rawExpense && rawExpense.createdAt) || new Date().toISOString(),
     updatedAt: normalizeString(rawExpense && rawExpense.updatedAt) || new Date().toISOString()
@@ -589,8 +590,8 @@ function normalizeExpense(rawExpense) {
 function buildDefaultState() {
   return {
     meta: {
-      title: "Bitacora Japon 2026",
-      subtitle: "Checklist del viaje, gastos y diario compartido",
+      title: "Viaje simiesco japonesil",
+      subtitle: "",
       driveFolderName: "PROGRAMA_VIAJE_JAPON"
     },
     days: BASE_DAYS.map((day) => normalizeDay({}, day)),
@@ -613,7 +614,9 @@ export function normalizeState(rawState) {
   return {
     meta: {
       ...defaultState.meta,
-      ...(rawState.meta && typeof rawState.meta === "object" ? rawState.meta : {})
+      ...(rawState.meta && typeof rawState.meta === "object" ? rawState.meta : {}),
+      title: defaultState.meta.title,
+      subtitle: defaultState.meta.subtitle
     },
     days: BASE_DAYS.map((baseDay) => normalizeDay(rawDaysById.get(baseDay.id), baseDay)),
     expenses: Array.isArray(rawState.expenses) ? rawState.expenses.map(normalizeExpense) : [],
