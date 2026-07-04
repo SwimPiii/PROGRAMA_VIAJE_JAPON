@@ -73,7 +73,7 @@ function formatDateTime(value) {
 }
 
 function formatCurrency(value) {
-  return new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR" }).format(Number(value || 0));
+  return new Intl.NumberFormat("ja-JP", { style: "currency", currency: "JPY", maximumFractionDigits: 0 }).format(Number(value || 0));
 }
 
 function newId(prefix) {
