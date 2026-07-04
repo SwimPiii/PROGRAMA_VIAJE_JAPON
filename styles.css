@@ -201,6 +201,11 @@ h3 {
   color: var(--teal);
 }
 
+.btn.danger {
+  background: rgba(179, 57, 57, 0.14);
+  color: #8f2d2d;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;

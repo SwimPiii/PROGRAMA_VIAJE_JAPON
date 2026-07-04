@@ -290,7 +290,7 @@ function renderExpenses() {
               <td>${escapeHtml(expense.paidBy)}</td>
               <td>${expense.isCommon ? "Si" : "No"}</td>
               <td class="amount">${escapeHtml(formatCurrency(expense.amount))}</td>
-              <td><button class="btn subtle" type="button" data-action="delete-expense" data-expense-id="${escapeHtml(expense.id)}">Borrar</button></td>
+              <td><button class="btn danger" type="button" data-action="delete-expense" data-expense-id="${escapeHtml(expense.id)}">Eliminar</button></td>
             </tr>
           `;
         })
@@ -491,6 +491,7 @@ async function handleAddExpense(event) {
 }
 
 async function handleDeleteExpense(expenseId) {
+  if (!expenseId) return;
   appState.expenses = appState.expenses.filter((expense) => expense.id !== expenseId);
   renderExpenses();
   renderActivity();
